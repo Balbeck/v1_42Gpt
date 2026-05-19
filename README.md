@@ -1,7 +1,10 @@
 # 42Gpt
-To Run :
+To Run:
+`cd ./42Gpt-Index_RetrievalPipeline`
+	or
+`cd ./42Gpt-RAG_RetrievalPipeline`
+then:
 ```bash
-cd ./42Gpt-RetrievalPipeline
 sh ./launch42Gpt.sh
 ```
 
