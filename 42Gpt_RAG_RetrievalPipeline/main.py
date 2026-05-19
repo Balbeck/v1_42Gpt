@@ -6,7 +6,8 @@ import numpy as np
 
 # - - - [ Variables ] - - -
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_GENERATION_MODEL = "mistral:latest" #mistral7B
+OLLAMA_GENERATION_MODEL = "mistral:latest" # mistral:7b
+# OLLAMA_GENERATION_MODEL = "ministral-3:3b"
 
 # OLLAMA_EMBEDDING_MODEL = "embeddinggemma:300m" # dim: 768
 OLLAMA_EMBEDDING_MODEL = "snowflake-arctic-embed:335m" # dim: 1024
@@ -141,7 +142,7 @@ def print_results(title: str, results: list[dict]):
 
 	for rank, r in enumerate(results, start=1):
 		print(f"  #{rank}  📄 {r['filepath']}  (score: {r['score']:.4f})")
-		print(f"       Question indexée : {r['question']}")
+		print(f"\tQuestion indexee : {r['question']}")
 
 
 
@@ -206,29 +207,51 @@ def generate_finale_answer(query: str, doc_contents: dict[str, str]) -> str:
 	if not doc_contents:
 		return " ❌ Aucun document disponible pour générer une réponse."
 
-	# Construction du contexte : on concatène tous les documents
 	context_parts = []
 	for filename, content in doc_contents.items():
 		context_parts.append(f"--- Document : {filename} ---\n{content}")
 
 	context = "\n\n".join(context_parts)
 
-	prompt = f"""Tu es un assistant qui répond aux questions en se basant uniquement sur les documents fournis.
+# 	prompt = f"""Tu es un assistant qui répond aux questions en se basant uniquement sur les documents fournis.
 
-DOCUMENTS DE REFERENCE :
-{context}
+# DOCUMENTS DE REFERENCE :
+# {context}
 
-QUESTION :
-{query}
+# QUESTION :
+# {query}
 
-INSTRUCTIONS :
-- Réponds uniquement à partir des informations contenues dans les documents ci-dessus.
-- Si la réponse ne s'y trouve pas, dis-le clairement.
-- Sois précis !
-- Tu dois etre le plus exhaustif possible !
-- Si besoin renvoie l'integralite des informations du DOCUMENTS DE REFERENCE.
+# INSTRUCTIONS :
+# - Réponds uniquement à partir des informations contenues dans les documents ci-dessus.
+# - Si la réponse ne s'y trouve pas, dis-le clairement.
+# - Sois précis !
+# - Tu dois etre le plus exhaustif possible !
+# - Si besoin renvoie l'integralite des informations du DOCUMENTS DE REFERENCE.
 
-RÉPONSE :"""
+# RÉPONSE :"""
+
+
+	prompt = f"""
+		Tu es un assistant qui répond à des questions en t'appuyant exclusivement sur les documents fournis ci-dessous.
+
+		=== DOCUMENTS DE RÉFÉRENCE ===
+		{context}
+		=== FIN DES DOCUMENTS ===
+
+		QUESTION : {query}
+
+		RÈGLES :
+		1. Base ta réponse uniquement sur le contenu des documents ci-dessus. N'utilise aucune connaissance externe.
+		2. Si l'information n'est pas présente, réponds exactement : "L'information n'est pas présente dans les documents fournis." Ne devine pas, n'extrapole pas.
+		3. Sois exhaustif : reprends tous les éléments pertinents des documents qui répondent à la question, sans en omettre.
+		4. Sois fidèle : ne reformule pas au point de modifier le sens. Cite les passages-clés tels quels entre guillemets si utile.
+		5. Sois tres précis, exhaustif et surtout n'inventes rien !
+		6. Si besoin renvoie les informations integrales des documents.
+
+		RÉPONSE :
+		"""
+
+
 
 	url = f"{OLLAMA_BASE_URL}/api/generate"
 	payload = {
@@ -238,7 +261,7 @@ RÉPONSE :"""
 	}
 
 	try:
-		print(f"\t🤖 Send request to {OLLAMA_GENERATION_MODEL}...")
+		print(f"\t🤖 Send request to [ {OLLAMA_GENERATION_MODEL} ]...")
 		response = requests.post(url, json=payload, timeout=120)
 		response.raise_for_status()
 
@@ -267,7 +290,7 @@ if __name__ == "__main__":
 
 
 	#  - [2] - [ Embeding de la Query ] - - -
-	print(f"🫆 Generate Embeding: '{query}'")
+	print(f"\t🫆 Generate Embeding: '{query}'")
 	query_embedding = generate_embedding(query)
 	if query_embedding is None:
 		print(" ❌ [ Error ] in embeding generation")

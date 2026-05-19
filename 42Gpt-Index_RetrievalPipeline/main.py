@@ -8,7 +8,8 @@ import requests
 
 # 				- - - [ Variables ] - - -
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_GENERATION_MODEL = "mistral:latest" #mistral7B
+OLLAMA_GENERATION_MODEL = "mistral:latest" # mistral:7b
+# OLLAMA_GENERATION_MODEL = "ministral-3:3b"
 
 DOCUMENTS_FOLDER = "./LLMWiki/documents/"
 INDEX_PATH = "./LLMWiki/index.md"
