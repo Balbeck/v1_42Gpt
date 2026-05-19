@@ -195,7 +195,7 @@ if __name__ == "__main__":
 		#  - [4] - [ Parse & Deliver Final Answer ] - - -
 			# Send formated final answer to User
 		answer = generate_finale_answer(query, doc_contents)
-		print("🤖  - *[ Response ]* -  🤖")
+		print("\n🤖  - *[ Response ]* -  🤖")
 		print(answer)
 		print("-" * 60)
 		print()
